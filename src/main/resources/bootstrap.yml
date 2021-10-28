@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: user-api-gateway
+  cloud:
+    vault:
+      fail-fast: true
+      authentication: TOKEN
+      token: ${VAULT_TOKEN}
+      uri: ${VAULT_URI}
+      kv:
+        enabled: true
+        backend: ${VAULT_BACKEND}
+    kubernetes:
+      reload:
+        enabled: true
+      config:
+        enabled: true
+        namespace: ${KUBERNETES_NAMESPACE}
+#
+pcf:
+  datacenter:
+    details:
+      dcname: ${DC_NAME}
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud: "WARN"
+        beans:
+          factory:
+            config: "WARN"

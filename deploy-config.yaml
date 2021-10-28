@@ -1,0 +1,280 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: user-api-gateway
+  namespace: saas-it-cstg
+data:
+  application.yml: |-
+    resilience4j:
+      circuitbreaker:
+        configs:
+          default:
+            recordExceptions:
+              - java.net.ConnectException
+              - javax.net.ssl.SSLHandshakeException
+
+    spring:
+      cloud:
+        gateway:
+          httpclient:
+            connect-timeout: 1000
+            response-timeout: 30s
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders:
+                  - Authorization
+          routes:
+            - id: userProfileService
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileService-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/userprofiles
+              predicates:
+              - Path=/ups/api/v1.0/userprofiles
+            - id: userProfileService-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+              - Path=/fallback/ups/api/v1.0/userprofiles
+            - id: userProfileServiceResetpassword
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceResetpassword-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/userprofiles/resetpassword
+              predicates:
+              - Path=/ups/api/v1.0/userprofiles/resetpassword
+            - id: userProfileServiceResetpassword-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                  - StripPrefix=2
+                  - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+              - Path=/fallback/ups/api/v1.0/userprofiles/resetpassword
+            - id: userProfileServiceUpdatestatus
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceUpdatestatus-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/userprofiles/updatestatus
+              predicates:
+                - Path=/ups/api/v1.0/userprofiles/updatestatus
+            - id: userProfileServiceUpdatestatus-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/ups/api/v1.0/userprofiles/updatestatus
+            - id: userProfileServiceMFA
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceMFA-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/mfa/activation
+              predicates:
+                - Path=/ups/api/v1.0/mfa/activation
+            - id: userProfileServiceMFA-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                  - StripPrefix=2
+                  - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/mfa/activation
+            - id: userProfileServiceUpdateMFA
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceUpdateMFA-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/mfa/config
+              predicates:
+                - Path=/ups/api/v1.0/mfa/config
+            - id: userProfileServiceUpdateMFA-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/mfa/config
+            - id: userProfileServiceMFASecret
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceMFASecret-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/mfa/secret
+              predicates:
+                - Path=/ups/api/v1.0/mfa/secret
+            - id: userProfileServiceMFASecret-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/mfa/secret
+            - id: userProfileServiceRecoveryCode
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceMFAActivation-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/mfa/recoverycodes
+              predicates:
+                - Path=/ups/api/v1.0/mfa/recoverycodes
+            - id: userProfileServiceRecoveryCode-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                  - StripPrefix=2
+                  - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/mfa/recoverycodes
+            - id: userProfileServiceRecoveryCodeAuthentication
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceRecoveryCodeAuthentication-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/user/mfa/recoverycode/authenticate
+              predicates:
+                - Path=/ups/api/v1.0/user/mfa/recoverycode/authenticate
+            - id: userProfileServiceRecoveryCodeAuthentication-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/user/mfa/recoverycode/authenticate
+            - id: userProfileServiceMFAAuthentication
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceMFAAuthentication-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/user/mfa/authentication
+              predicates:
+                - Path=/ups/api/v1.0/user/mfa/authentication
+            - id: userProfileServiceMFAAuthentication-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/user/mfa/authentication
+            - id: userProfileServiceMFAAuthentication
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceMFAAuthentication-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/user/mfa/authentication
+              predicates:
+                - Path=/ups/api/v1.0/user/mfa/authentication
+            - id: userProfileServiceMFAAuthentication-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/user/mfa/authentication
+            - id: userProfileServiceMFAFalg
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceMFAFalg-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/mfa/flag
+              predicates:
+                - Path=/ups/api/v1.0/mfa/flag
+            - id: userProfileServiceMFAFalg-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/mfa/flag
+            - id: userProfileServiceMFAattribute
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceMFAattribute-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/mfa/configuration/attribute
+              predicates:
+                - Path=/ups/api/v1.0/mfa/configuration/attribute
+            - id: userProfileServiceMFAattribute-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/mfa/configuration/attribute
+            - id: userProfileServiceMFstatus
+              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userProfileServiceMFstatus-fallback
+                    fallbackUri: forward:/fallback/ups/api/v1.0/mfa/configuration/status
+              predicates:
+                - Path=/ups/api/v1.0/mfa/configuration/status
+            - id: userProfileServiceMFstatus-fallback
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - StripPrefix=2
+                - BasicAuth=gatewayuser:g@13w@2us3r
+              predicates:
+                - Path=/fallback/ups/api/v1.0/mfa/configuration/status
+    resilience.timelimiter: 20
+    status.date.format: "MM.dd.yyyy HH:mm:ss"
+    management.metrics.export.wavefront.enabled: "true"
+    management.metrics.export.wavefront.uri: "proxy://wvf-nprd-wdcpxy.vmware.com:2878"
+    management.metrics.export.wavefront.step: "10s"
+    management.metrics.export.wavefront.source: "user-api-gateway-cstage-tkg-wdc-np"
+    management.metrics.use-global-registry: "false"
+    wavefront.directIngestionEnabled: "false"
+    wavefront.application.name: "Identity-AWS"
+    wavefront.application.service: "user-api-gateway"
+    wavefront.application.cluster: "platform"
+    wavefront.direct-ingestion-enabled: "false"
+    wavefront.tracing.enabled: "true"
+    wavefront.tracing.extract-jvm-metrics: "true"
+    wavefront.jvm.reporter.enabled: "true"
+    wavefront.meter.registry.enabled: "true"
+
