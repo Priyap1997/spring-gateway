@@ -16,7 +16,45 @@ spring:
       config:
         enabled: true
         namespace: ${KUBERNETES_NAMESPACE}
-#
+    gateway:
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 30s
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders:
+              - Authorization
+      routes:
+        - id: userProfileService
+          uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+          filters:
+            - BasicAuth=gatewayuser:g@13w@2us3r
+            - RewritePath=/ups/(?<segment>.*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: userProfileService-fallback
+                fallbackUri: forward:/fallback/ups/**
+          predicates:
+          - Path=/ups/**
+        - id: userProfileService-fallback
+          uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+          filters:
+            - PathResolver=/fallback/ups/(?<segment>.*), /$\{segment}
+          predicates:
+          - Path=/fallback/ups/**
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        recordExceptions:
+          - java.net.ConnectException
+          - javax.net.ssl.SSLHandshakeException
+
+
 pcf:
   datacenter:
     details:
