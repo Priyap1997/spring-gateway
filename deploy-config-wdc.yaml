@@ -1,0 +1,87 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: user-api-gateway
+  namespace: saas-it-cstg
+data:
+  application.yml: |-
+    resilience4j:
+      circuitbreaker:
+        configs:
+          default:
+            recordExceptions:
+              - java.net.ConnectException
+              - javax.net.ssl.SSLHandshakeException
+
+    spring:
+      cloud:
+        gateway:
+          httpclient:
+            connect-timeout: 1000
+            response-timeout: 30s
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders:
+                  - Authorization
+          routes:
+            - id: userProfileService
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - BasicAuth=gatewayuser:g@13w@2us3r
+                - RewritePath=/ups/(?<segment>.*), /$\{segment}
+                - name: CircuitBreaker
+                  args:
+                    routeId: userProfileService-fallback
+                    name: userProfileService-fallback
+                    fallbackUri: forward:/fallback/ups/**
+                - name: Retry
+                  args:
+                    retries: 3
+                    methods: GET,POST,PUT,DELETE
+                    exceptions: org.springframework.cloud.gateway.support.TimeoutException,java.net.ConnectException
+                    backoff:
+                      firstBackoff: 1000ms
+                      factor: 2
+                      basedOnPreviousValue: true
+              predicates:
+                - Path=/ups/**
+            - id: gateway-fallback
+              uri: http://10.224.230.112:443
+              filters:
+                - PathResolver=/fallback/(?<segment>.*), /$\{segment}
+              predicates:
+                - Path=/fallback/**
+            - id: saasUserService
+              uri: http://saasuserservicev2-wdc-saas-it-cstg.tkg.vmware.com
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    routeId: saasUserService-fallback
+                    name: saasUserService-fallback
+                    fallbackUri: forward:/fallback/v2/users/**
+                - name: Retry
+                  args:
+                     retries: 3
+                     methods: GET,POST,PUT,DELETE
+                     exceptions: org.springframework.cloud.gateway.support.TimeoutException,java.net.ConnectException
+                     backoff:
+                       firstBackoff: 1000ms
+                       factor: 2
+                       basedOnPreviousValue: true
+              predicates:
+                - Path=/v2/users/**
+    resilience.timelimiter: 20
+    status.date.format: "MM.dd.yyyy HH:mm:ss"
+    management.metrics.export.wavefront.enabled: "true"
+    management.metrics.export.wavefront.uri: "proxy://wvf-nprd-wdcpxy.vmware.com:2878"
+    management.metrics.export.wavefront.step: "10s"
+    management.metrics.export.wavefront.source: "user-api-gateway-cstage-tkg-wdc-np"
+    management.metrics.use-global-registry: "false"
+    wavefront.directIngestionEnabled: "false"
+    wavefront.application.name: "SCG-POC"
+    wavefront.application.service: "user-api-gateway"
+    wavefront.application.cluster: "cstg-wdc"
+

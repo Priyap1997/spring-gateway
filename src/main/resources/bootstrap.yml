@@ -16,7 +16,82 @@ spring:
       config:
         enabled: true
         namespace: ${KUBERNETES_NAMESPACE}
-#
+    gateway:
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 30s
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders:
+              - Authorization
+      routes:
+        - id: userProfileService
+          uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+          filters:
+            - BasicAuth=gatewayuser:g@13w@2us3r
+            - RewritePath=/ups/(?<segment>.*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                routeId: userProfileService-fallback
+                name: userProfileService-fallback
+                fallbackUri: forward:/fallback/ups/**
+                statusCodes:
+                - NOT_FOUND
+            - name: Retry
+              args:
+                  retries: 3
+                  methods: GET,POST,PUT,DELETE
+                  statuses: NOT_FOUND
+                  exceptions: org.springframework.cloud.gateway.support.TimeoutException,java.net.ConnectException
+                  backoff:
+                    firstBackoff: 1000ms
+                    factor: 2
+                    basedOnPreviousValue: true
+          predicates:
+          - Path=/ups/**
+        - id: userProfileService-fallback
+          uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
+          filters:
+            - PathResolver=/fallback/ups/(?<segment>.*), /$\{segment}
+          predicates:
+          - Path=/fallback/ups/**
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        failureRateThreshold: 100
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        waitDurationInOpenState: 60000
+        slidingWindowSize: 2
+        permittedNumberOfCallsInHalfOpenState: 1
+        recordExceptions:
+          - java.net.ConnectException
+          - javax.net.ssl.SSLHandshakeException
+          - org.springframework.cloud.gateway.support.TimeoutException
+    instances:
+      userProfileService-fallback:
+        failureRateThreshold: 100
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        waitDurationInOpenState: 60s
+        slidingWindowSize: 2
+        permittedNumberOfCallsInHalfOpenState: 1
+        recordExceptions:
+          - java.net.ConnectException
+          - javax.net.ssl.SSLHandshakeException
+          - org.springframework.cloud.gateway.support.TimeoutException
+
+
+resilience4j.timelimiter:
+  configs:
+    default:
+      cancelRunningFuture: false
+      timeoutDuration: 20s
 pcf:
   datacenter:
     details:
