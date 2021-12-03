@@ -1,21 +1,21 @@
-#---
-#kind: Service
-#apiVersion: v1
-#metadata:
-#  annotations:
-#    external-dns.alpha.kubernetes.io/hostname: user-api-gateway-wdc-saas-it-cstg.tkg.vmware.com
-#  name: user-api-gateway
-#  labels:
-#    app: user-api-gateway
-#spec:
-#  selector:
-#    app: user-api-gateway
-#  ports:
-#    - name: https
-#      protocol: TCP
-#      port: 80
-#      targetPort: 8080
-#  type: LoadBalancer
+---
+kind: Service
+apiVersion: v1
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: user-api-gateway-wdc-saas-it-cstg.tkg.vmware.com
+  name: user-api-gateway
+  labels:
+    app: user-api-gateway
+spec:
+  selector:
+    app: user-api-gateway
+  ports:
+    - name: https
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
 
 ---
 apiVersion: apps/v1
@@ -45,7 +45,7 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           privileged: false
-        image: harbor-repo.vmware.com/identity_tkg/user_api_gateway:v4
+        image: harbor-repo.vmware.com/identity_tkg/user_api_gateway:v7
         env:
           - name: SPRING_PROFILES_ACTIVE
             value: "cstage"
