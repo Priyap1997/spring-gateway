@@ -45,7 +45,7 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           privileged: false
-        image: harbor-repo.vmware.com/identity_tkg/user_api_gateway:v7
+        image: harbor-repo.vmware.com/identity_tkg/user_api_gateway:v1
         env:
           - name: SPRING_PROFILES_ACTIVE
             value: "cstage"

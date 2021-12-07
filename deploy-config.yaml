@@ -30,12 +30,13 @@ data:
             recordExceptions:
               - java.net.ConnectException
               - javax.net.ssl.SSLHandshakeException
+              - org.springframework.cloud.gateway.support.TimeoutException
 
     resilience4j.timelimiter:
       configs:
         default:
           cancelRunningFuture: false
-          timeoutDuration: 20s
+          timeoutDuration: 30s
 
     spring:
       cloud:
@@ -54,7 +55,7 @@ data:
             - id: userProfileService
               uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
               filters:
-              - BasicAuth=gatewayuser:g@13w@2us3r
+              - BasicAuth=${ups.auth.username}:${ups.auth.password}
               - RewritePath=/ups/(?<segment>.*), /$\{segment}
               - name: CircuitBreaker
                 args:
@@ -98,15 +99,15 @@ data:
               predicates:
                 - Path=/fallback/**
     status.date.format: "MM.dd.yyyy HH:mm:ss"
-    management.metrics.export.wavefront.enabled: "true"
-    management.metrics.export.wavefront.uri: "proxy://wvf-nprd-wdcpxy.vmware.com:2878"
-    management.metrics.export.wavefront.step: "10s"
-    management.metrics.export.wavefront.source: "user-api-gateway-cstage-tkg-sc2-np"
-    management.metrics.use-global-registry: "false"
-    wavefront.directIngestionEnabled: "false"
-    wavefront.application.name: "SCG-POC"
-    wavefront.application.service: "user-api-gateway"
-    wavefront.application.cluster: "cstg"
+    management.metrics.export.wavefront.enabled: true
+    management.metrics.export.wavefront.uri: proxy://wvf-nprd-wdcpxy.vmware.com:2878
+    management.metrics.export.wavefront.step: 10s
+    management.metrics.export.wavefront.source: user-api-gateway-cstage-tkg-sc2
+    management.metrics.use-global-registry: false
+    wavefront.directIngestionEnabled: false
+    wavefront.application.name: SCG-POC
+    wavefront.application.service: user-api-gateway
+    wavefront.application.cluster: cstg-sc2
     logging.level.org.springframework.cloud.gateway.filter.factory: TRACE
 
 
