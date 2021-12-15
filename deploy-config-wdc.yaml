@@ -30,7 +30,6 @@ data:
             recordExceptions:
               - java.net.ConnectException
               - javax.net.ssl.SSLHandshakeException
-              - org.springframework.cloud.gateway.support.TimeoutException
 
     resilience4j.timelimiter:
       configs:
@@ -53,7 +52,7 @@ data:
                   - Authorization
           routes:
             - id: userProfileService
-              uri: http://user-profile-service-sc2-saas-it-cstg.tkg.vmware.com
+              uri: http://user-profile-service-wdc-saas-it-cstg.tkg.vmware.com
               filters:
               - BasicAuth=${ups.auth.username}:${ups.auth.password}
               - RewritePath=/ups/(?<segment>.*), /$\{segment}
@@ -74,7 +73,7 @@ data:
               predicates:
               - Path=/ups/**
             - id: saasUserService
-              uri: http://saasuserservicev2-sc2-saas-it-cstg.tkg.vmware.com
+              uri: http://saasuserservicev2-wdc-saas-it-cstg.tkg.vmware.com
               filters:
                 - name: CircuitBreaker
                   args:
@@ -93,7 +92,7 @@ data:
               predicates:
                 - Path=/v2/users/**
             - id: gateway-fallback
-              uri: http://user-api-gateway-wdc-saas-it-cstg.tkg.vmware.com
+              uri: http://10.224.230.112:443
               filters:
                 - PathResolver=/fallback/(?<segment>.*), /$\{segment}
               predicates:
@@ -102,13 +101,10 @@ data:
     management.metrics.export.wavefront.enabled: true
     management.metrics.export.wavefront.uri: proxy://wvf-nprd-wdcpxy.vmware.com:2878
     management.metrics.export.wavefront.step: 10s
-    management.metrics.export.wavefront.source: user-api-gateway-cstage-tkg-sc2
+    management.metrics.export.wavefront.source: user-api-gateway-cstage-tkg-wdc-np
     management.metrics.use-global-registry: false
     wavefront.directIngestionEnabled: false
     wavefront.application.name: SCG-POC
     wavefront.application.service: user-api-gateway
-    wavefront.application.cluster: cstg-sc2
-    logging.level.org.springframework.cloud.gateway.filter.factory: TRACE
-
-
+    wavefront.application.cluster: cstg-wdc
 

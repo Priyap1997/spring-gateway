@@ -2,7 +2,7 @@
 <configuration>
     <springProperty name="app-name" source="spring.application.name" />
     <property name="LOG_PATTERN"
-        value="${app-name},%d{HH:mm:ss.SSS} [%thread] %-5level [%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] %logger{36} - %msg%n" />
+        value="${app-name},%d{HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n" />
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${LOG_PATTERN}
