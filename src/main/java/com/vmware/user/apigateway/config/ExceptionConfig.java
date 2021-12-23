@@ -19,7 +19,7 @@ import java.util.List;
 public class ExceptionConfig {
 
     /**
-     * Custom Exception Handling [@@] Beans that are dependent on the Bean registration will be retrieved directly from the container, so you can directly inject it.
+     * Custom Exception Handling Beans that are dependent on the Bean registration will be retrieved directly from the container, so you can directly inject it.
      */
     @Primary
     @Bean

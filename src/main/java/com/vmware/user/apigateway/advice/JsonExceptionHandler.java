@@ -1,10 +1,7 @@
 package com.vmware.user.apigateway.advice;
 
-import com.vmware.user.apigateway.controller.ApiGatewayController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -24,18 +21,15 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.security.auth.login.LoginException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * The ExceptionHandler to customize error messages.
+ */
 public class JsonExceptionHandler implements ErrorWebExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonExceptionHandler.class);
 
-    @Value("${status.date.format}")
-    private String dateFormat;
-
-     @Autowired
-     ApiGatewayController apiGatewayController;
     /**
      * MessageReader
      */
@@ -58,6 +52,8 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
 
     /**
      * Reference AbstractErrorWebExceptionHandler
+     *
+     * @param messageReaders the message readers
      */
     public void setMessageReaders(List<HttpMessageReader<?>> messageReaders) {
         Assert.notNull(messageReaders, "'messageReaders' must not be null");
@@ -66,6 +62,8 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
 
     /**
      * Reference AbstractErrorWebExceptionHandler
+     *
+     * @param viewResolvers the view resolvers
      */
     public void setViewResolvers(List<ViewResolver> viewResolvers) {
         this.viewResolvers = viewResolvers;
@@ -73,6 +71,8 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
 
     /**
      * Reference AbstractErrorWebExceptionHandler
+     *
+     * @param messageWriters the message writers
      */
     public void setMessageWriters(List<HttpMessageWriter<?>> messageWriters) {
         Assert.notNull(messageWriters, "'messageWriters' must not be null");
@@ -84,64 +84,38 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
         HttpStatus httpStatus = null;
         String body = null;
         String error = null;
-        String pingMsg= null;
         if (ex instanceof NotFoundException) {
             httpStatus = HttpStatus.NOT_FOUND;
             body = "Service Not Found";
-            error =  "Not found";
-            
+            error = "Not found";
         } else if (ex instanceof ResponseStatusException) {
             ResponseStatusException responseStatusException = (ResponseStatusException) ex;
             httpStatus = responseStatusException.getStatus();
             body = responseStatusException.getMessage();
-            error =  "ResponseStatusException";
-         } else if (ex instanceof LoginException){
-            if(exchange.getRequest().getPath().toString().equals("/ping"))
-            {
-                httpStatus = HttpStatus.OK;
-
-                Date startDate = new Date(apiGatewayController.startTimestampInMilli);
-                String startDateString = new SimpleDateFormat(dateFormat).format(startDate);
-                String activeTime = String.valueOf(System.currentTimeMillis() - apiGatewayController.startTimestampInMilli);
-                pingMsg = "{\n" +
-                        "    \"status\": \"UP\",\n" +
-                        "    \"startTime\": \""+startDateString+"\",\n" +
-                        "    \"activeTime\": \""+activeTime+"\"\n" +
-                        "}";
-
-            }
-            else {
-
-                LoginException responseStatusException = (LoginException) ex;
-                httpStatus = HttpStatus.UNAUTHORIZED;
-                body = responseStatusException.getMessage();
-                error =  "Unauthorized";
-            }
-
-        }
-        else {
+            error = "ResponseStatusException";
+        } else if (ex instanceof LoginException) {
+            LoginException responseStatusException = (LoginException) ex;
+            httpStatus = HttpStatus.UNAUTHORIZED;
+            body = responseStatusException.getMessage();
+            error = "Unauthorized";
+        } else {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            error = "Internal Server Error";
             body = "Internal Server Error";
         }
 
         Map<String, Object> result = new HashMap<>(2, 1);
         result.put("httpStatus", httpStatus);
         String msg = "{\n" +
-                "    \"timestamp\":"+ System.currentTimeMillis() +",\n" +
-                "    \"status\":"+ httpStatus.value()+",\n" +
-                "    \"error\": \"" +error+ "\",\n" +
-                "    \"message\": \""+body+"\",\n" +
-                "    \"path\": \""+exchange.getRequest().getPath()+"\"\n" +
+                "    \"timestamp\":" + System.currentTimeMillis() + ",\n" +
+                "    \"status\":" + httpStatus.value() + ",\n" +
+                "    \"error\": \"" + error + "\",\n" +
+                "    \"message\": \"" + body + "\",\n" +
+                "    \"path\": \"" + exchange.getRequest().getPath() + "\"\n" +
                 "}";
-
-        if(pingMsg != null)
-        result.put("body", pingMsg);
-        else
-        {result.put("body", msg);}
-
+        result.put("body", msg);
         ServerHttpRequest request = exchange.getRequest();
-        logger.error("[Global Exception Handling] exception request path: {}, record exception information: {}", request.getPath(), ex.getMessage());
-
+        logger.error("[Global Exception Handling] exception for request path: {}, record exception information: {}", request.getPath(), ex.getMessage());
         if (exchange.getResponse().isCommitted()) {
             return Mono.error(ex);
         }
@@ -156,6 +130,9 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
 
     /**
      * Refer to DefaultErrorWebExceptionHandler
+     *
+     * @param request the request
+     * @return the mono
      */
     protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
         Map<String, Object> result = exceptionHandlerResult.get();
@@ -177,7 +154,7 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
     /**
      * Reference AbstractErrorWebExceptionHandler
      */
-    private class ResponseContext implements ServerResponse.Context {
+       private class ResponseContext implements ServerResponse.Context {
 
         @Override
         public List<HttpMessageWriter<?>> messageWriters() {

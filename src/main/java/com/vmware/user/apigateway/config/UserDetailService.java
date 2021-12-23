@@ -9,26 +9,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/**
+ * <code>UserDetailService</code> is class to hold authenticated user details.
+ */
 @Component
 public class UserDetailService implements ReactiveUserDetailsService {
 
-    @Value("${security.user.name}")
-    private String username;
-
-    @Value("${security.user.password}")
-    private String password;
-
+    /**
+     * The Encoder.
+     */
     @Autowired
     PasswordEncoder encoder;
+    @Value("${security.user.name}")
+    private String username;
+    @Value("${security.user.password}")
+    private String password;
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         User.UserBuilder user = User.withUsername(username)
-				// .roles("USER")
 				.roles("ADMIN")
-				// .roles("APPROLE")
 				.password(encoder.encode(password));
-
 		return  Mono.just(user.build());
     }
 }

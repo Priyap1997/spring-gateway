@@ -3,7 +3,7 @@ kind: Service
 apiVersion: v1
 metadata:
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: user-api-gateway-sc2-saas-it-cstg.tkg.vmware.com
+    external-dns.alpha.kubernetes.io/hostname: user-api-gateway-aws-saas-it-cstg.tkg.vmware.com
   name: user-api-gateway
   labels:
     app: user-api-gateway
@@ -49,8 +49,10 @@ spec:
         env:
           - name: SPRING_PROFILES_ACTIVE
             value: "cstage"
-          - name: VAULT_TOKEN
-            value: "s.7eOzMaDrv3SQaDFNwWsVFr7Z"
+          - name: ROLE_ID
+            value: "db02ddb8-a390-0239-980e-11ec742f95ab"
+          - name: SECRET_ID
+            value: "8d9af101-5764-124d-f5e4-ab93fa9ed2c3"
           - name: VAULT_URI
             value: "https://vaultui.vmware.com"
           - name: VAULT_BACKEND

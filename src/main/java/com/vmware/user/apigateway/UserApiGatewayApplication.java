@@ -21,21 +21,36 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 
 import java.time.Duration;
 
+/**
+ * The user-api-gateway application.
+ */
 @EnableRetry
 @SpringBootApplication
 @RefreshScope
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 @ComponentScan(basePackages = {"com.vmware"})
 public class UserApiGatewayApplication {
 
     @Value("${resilience.timelimiter}")
     Long timeout;
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(UserApiGatewayApplication.class, args);
     }
 
 
+    /**
+     * Reactive resilience4j bean to set circuitBreaker and timeLimiter config.
+     *
+     * @param circuitBreakerRegistry the circuit breaker registry
+     * @param timeLimiterRegistry    the time limiter registry
+     * @return the reactive resilience4jCircuitBreakerFactory.
+     */
     @Bean
     public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer() {
         return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)

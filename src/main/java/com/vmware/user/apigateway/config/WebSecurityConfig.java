@@ -1,12 +1,8 @@
 package com.vmware.user.apigateway.config;
 
-//
-//import com.vmware.platform.gateway.advice.AppControllerAdvice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -16,40 +12,53 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+/**
+ * <code>WebSecurityConfig</code> is class to enable Spring Security.
+ */
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class WebSecurityConfig {
-	private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
 
-    @Autowired
-	AuthenticationManager authenticationManager;
+	/**
+	 * The Authentication manager.
+	 */
+	@Autowired
+    AuthenticationManager authenticationManager;
 
-    @Value("${security.user.name}")
-	private String username;
+	/**
+	 * The Authorization manager.
+	 */
+	@Autowired
+    AuthorizationManager authorizationManager;
 
-	@Value("${security.user.password}")
-	private String password;
+	/**
+	 * Security filter chain security web filter chain.
+	 *
+	 * @param http the http
+	 * @return the security web filter chain
+	 */
 	@Bean
-	public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
 
-		 return http.csrf().disable()
-	               .authorizeExchange()
-	                   .matchers(EndpointRequest.toAnyEndpoint()).authenticated()
-	                   .anyExchange().authenticated()
-	                   .and()
-	               .httpBasic().authenticationManager(authenticationManager)
-	                  .and()
-	               .build();
+        return http.csrf().disable().authorizeExchange().pathMatchers("/ping").permitAll()
+                .pathMatchers("/**").access(authorizationManager)
+                .and()
+                .httpBasic().and().formLogin().authenticationManager(authenticationManager)
+                .and().build();
+    }
 
-	}
-
+	/**
+	 * Password encoder password encoder.
+	 *
+	 * @return the password encoder
+	 */
 	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 
 }
