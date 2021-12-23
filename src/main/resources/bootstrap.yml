@@ -62,11 +62,35 @@ resilience4j:
   circuitbreaker:
     configs:
       default:
+        failureRateThreshold: 100
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        waitDurationInOpenState: 60000
+        slidingWindowSize: 2
+        permittedNumberOfCallsInHalfOpenState: 1
         recordExceptions:
           - java.net.ConnectException
           - javax.net.ssl.SSLHandshakeException
+          - org.springframework.cloud.gateway.support.TimeoutException
+    instances:
+      userProfileService-fallback:
+        failureRateThreshold: 100
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        waitDurationInOpenState: 60s
+        slidingWindowSize: 2
+        permittedNumberOfCallsInHalfOpenState: 1
+        recordExceptions:
+          - java.net.ConnectException
+          - javax.net.ssl.SSLHandshakeException
+          - org.springframework.cloud.gateway.support.TimeoutException
 
 
+resilience4j.timelimiter:
+  configs:
+    default:
+      cancelRunningFuture: false
+      timeoutDuration: 20s
 pcf:
   datacenter:
     details:
