@@ -21,7 +21,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry
 @SpringBootApplication
 @RefreshScope
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 @ComponentScan(basePackages = {"com.vmware"})
 public class UserApiGatewayApplication {
 
