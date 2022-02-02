@@ -1,0 +1,12 @@
+BLUEPRINT:
+   APPLICATION: Kubernetes
+   OBJECT: K8s - Dockerfile
+   SUB_OBJECT: Deploy Docker Build
+   NAMESPACE: saas-it
+   APPLICATION_POD: saas-it-k8s
+OPTIONS:
+   BASE_IMAGE: artfact-prd-vip.vmware.com:5001/bitnami/java:jdk11_05
+   JDK: JDK1.11
+SERVICES:
+   CONFIG:
+      user-api-gateway: deploy-config.yaml
