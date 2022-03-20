@@ -1,6 +1,6 @@
 FROM artfact-prd-vip.vmware.com:5001/bitnami/java:jdk11_05
 EXPOSE 8080
-RUN yum  install maven -y
+RUN yum install maven -y
 WORKDIR /app
 COPY . /app
 RUN chown -R 1001:1001 /app
