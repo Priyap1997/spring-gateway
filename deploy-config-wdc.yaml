@@ -15,21 +15,6 @@ data:
             waitDurationInOpenState: 60000
             slidingWindowSize: 2
             permittedNumberOfCallsInHalfOpenState: 1
-            recordExceptions:
-              - java.net.ConnectException
-              - javax.net.ssl.SSLHandshakeException
-              - org.springframework.cloud.gateway.support.TimeoutException
-        instances:
-          userProfileService-fallback:
-            failureRateThreshold: 100
-            registerHealthIndicator: true
-            slidingWindowType: COUNT_BASED
-            waitDurationInOpenState: 60s
-            slidingWindowSize: 3
-            permittedNumberOfCallsInHalfOpenState: 2
-            recordExceptions:
-              - java.net.ConnectException
-              - javax.net.ssl.SSLHandshakeException
 
     resilience4j.timelimiter:
       configs:
@@ -61,9 +46,15 @@ data:
                   routeId: userProfileService-fallback
                   name: userProfileService-fallback
                   fallbackUri: forward:/fallback/ups/**
+                  statusCodes:
+                  - 500
+                  - 503
+                  - 401
               - name: Retry
                 args:
                   retries: 3
+                  statuses: BAD_GATEWAY,SERVICE_UNAVAILABLE,GATEWAY_TIMEOUT,UNAUTHORIZED
+                  series: SERVER_ERROR
                   methods: GET,POST,PUT,DELETE
                   exceptions: org.springframework.cloud.gateway.support.TimeoutException,java.net.ConnectException
                   backoff:
@@ -79,7 +70,7 @@ data:
                   args:
                     routeId: saasUserService-fallback
                     name: saasUserService-fallback
-                    fallbackUri: forward:/fallback/v2/users/**
+                    fallbackUri: forward:/fallback/**
                 - name: Retry
                   args:
                     retries: 3
@@ -92,7 +83,7 @@ data:
               predicates:
                 - Path=/v2/users/**
             - id: gateway-fallback
-              uri: http://10.224.230.112:443
+              uri: http://10.224.230.23:80
               filters:
                 - PathResolver=/fallback/(?<segment>.*), /$\{segment}
               predicates:
