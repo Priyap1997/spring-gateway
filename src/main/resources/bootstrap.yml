@@ -1,6 +1,8 @@
 spring:
   application:
     name: user-api-gateway
+  main:
+    allow-circular-references: true
   sleuth:
     scheduled:
       skipPattern: org.springframework.cloud.kubernetes.fabric8.discovery.KubernetesCatalogWatch

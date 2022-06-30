@@ -10,3 +10,7 @@ OPTIONS:
 SERVICES:
    CONFIG:
       user-api-gateway: deploy-config.yaml
+   INGRESS:
+      user-api-gateway: deploy-ingress.yaml
+   LOADBALANCER:
+      user-api-gateway: deploy-service.yaml

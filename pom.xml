@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.4</version>
+        <version>2.7.0</version>
         <relativePath/>
     </parent>
     <groupId>com.vmware</groupId>
@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
-        <spring-cloud.version>2020.0.2</spring-cloud.version>
+        <spring-cloud.version>2021.0.1</spring-cloud.version>
     </properties>
 
     <dependencies>
@@ -90,26 +90,14 @@
         <dependency>
             <groupId>com.wavefront</groupId>
             <artifactId>wavefront-spring-boot-starter</artifactId>
-            <version>2.1.0</version>
+            <version>2.2.0</version>
         </dependency>
 
         <!--        dependency for vault-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-vault-config</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.vault</groupId>
-                    <artifactId>spring-vault-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.vault</groupId>
-            <artifactId>spring-vault-core</artifactId>
-            <version>2.3.2</version>
-        </dependency>
-
         <!--        dependency for test case-->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -138,7 +126,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>2020.0.2</version>
+                <version>2021.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -162,13 +150,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -209,7 +190,7 @@
 
         <repository>
             <id>java.net.maven.2.plugin</id>
-            <url>http://maven.vmware.com/maven2</url>
+            <url>https://maven.vmware.com/maven2</url>
         </repository>
     </repositories>
 
