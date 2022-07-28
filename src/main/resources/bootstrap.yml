@@ -8,15 +8,18 @@ spring:
       skipPattern: org.springframework.cloud.kubernetes.fabric8.discovery.KubernetesCatalogWatch
   cloud:
     vault:
-      fail-fast: true
       authentication: APPROLE
-      app-role:
-        role-id: ${ROLE_ID}
-        secret-id: ${SECRET_ID}
+      fail-fast: ${FAIL_FAST}
       uri: ${VAULT_URI}
       kv:
         enabled: true
         backend: ${VAULT_BACKEND}
+        application-name: ${APPLICATION_NAME}
+      app-role:
+        role-id: ${ROLE_ID}
+        secret-id: ${SECRET_ID}
+      generic:
+        enabled: false
     kubernetes:
       reload:
         enabled: true
