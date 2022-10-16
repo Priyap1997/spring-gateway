@@ -1,0 +1,9 @@
+logging.level.root=WARN
+logging.level.com.vmware=DEBUG
+logging.config=classpath:logback-spring.xml
+security:
+  user:
+    name: user
+    password: pass
+logging.level.org.springframework.cloud=WARN
+management.endpoints.web.base-path=/actuator

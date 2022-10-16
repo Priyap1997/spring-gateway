@@ -19,20 +19,20 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class WebSecurityConfig {
-    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
 
 	/**
 	 * The Authentication manager.
 	 */
 	@Autowired
-    AuthenticationManager authenticationManager;
+	AuthenticationManager authenticationManager;
 
 	/**
 	 * The Authorization manager.
 	 */
 	@Autowired
-    AuthorizationManager authorizationManager;
+	AuthorizationManager authorizationManager;
 
 	/**
 	 * Security filter chain security web filter chain.
@@ -41,14 +41,14 @@ public class WebSecurityConfig {
 	 * @return the security web filter chain
 	 */
 	@Bean
-    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
+	public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
 
-        return http.csrf().disable().authorizeExchange().pathMatchers("/ping").permitAll()
-                .pathMatchers("/**").access(authorizationManager)
-                .and()
-                .httpBasic().and().formLogin().authenticationManager(authenticationManager)
-                .and().build();
-    }
+		return http.csrf().disable().authorizeExchange().pathMatchers("/ping").permitAll()
+				.pathMatchers("/**").access(authorizationManager)
+				.and()
+				.httpBasic().and().formLogin().authenticationManager(authenticationManager)
+				.and().build();
+	}
 
 	/**
 	 * Password encoder password encoder.
@@ -56,9 +56,9 @@ public class WebSecurityConfig {
 	 * @return the password encoder
 	 */
 	@Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
 
 }
