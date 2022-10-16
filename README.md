@@ -27,5 +27,4 @@ header Authorization Basic dXNlcjp1c2VycGFzcw==
 
 ###### **cURL**
 
-curl --location --request GET 'http://localhost:8090/api/hello' \\
---header 'Authorization: Basic dXNlcjp1c2VycGFzcw=='
+curl --location --request GET 'http://localhost:8090/api/hello' --header 'Authorization: Basic dXNlcjp1c2VycGFzcw=='
