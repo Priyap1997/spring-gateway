@@ -9,7 +9,7 @@
         <version>2.7.0</version>
         <relativePath/>
     </parent>
-    <groupId>com.vmware</groupId>
+    <groupId>com.user</groupId>
     <artifactId>spring-api-gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-api-gateway</name>
