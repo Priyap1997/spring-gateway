@@ -1,4 +1,4 @@
-package com.vmware.user.apigateway.advice;
+package com.user.gateway.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,10 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.security.auth.login.LoginException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The ExceptionHandler to customize error messages.
@@ -84,16 +87,7 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
         HttpStatus httpStatus = null;
         String body = null;
         String error = null;
-        if (ex instanceof NotFoundException) {
-            httpStatus = HttpStatus.NOT_FOUND;
-            body = "Service Not Found";
-            error = "Not found";
-        } else if (ex instanceof ResponseStatusException) {
-            ResponseStatusException responseStatusException = (ResponseStatusException) ex;
-            httpStatus = responseStatusException.getStatus();
-            body = responseStatusException.getMessage();
-            error = "ResponseStatusException";
-        } else if (ex instanceof LoginException) {
+        if (ex instanceof LoginException) {
             LoginException responseStatusException = (LoginException) ex;
             httpStatus = HttpStatus.UNAUTHORIZED;
             body = responseStatusException.getMessage();
@@ -107,15 +101,11 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
         Map<String, Object> result = new HashMap<>(2, 1);
         result.put("httpStatus", httpStatus);
         String msg = "{\n" +
-                "    \"timestamp\":" + System.currentTimeMillis() + ",\n" +
                 "    \"status\":" + httpStatus.value() + ",\n" +
-                "    \"error\": \"" + error + "\",\n" +
-                "    \"message\": \"" + body + "\",\n" +
                 "    \"path\": \"" + exchange.getRequest().getPath() + "\"\n" +
                 "}";
         result.put("body", msg);
         ServerHttpRequest request = exchange.getRequest();
-        logger.error("[Global Exception Handling] exception for request path: {}, record exception information: {}", request.getPath(), ex.getMessage());
         if (exchange.getResponse().isCommitted()) {
             return Mono.error(ex);
         }

@@ -1,4 +1,4 @@
-package com.vmware.user.apigateway.config;
+package com.user.gateway.config;
 
 
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     public Mono<Authentication> authenticate(Authentication authentication) {
 
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        authorities.add(new SimpleGrantedAuthority("ADMIN"));
         if (authentication.getCredentials() != null || !authentication.getCredentials().equals("")) {
             authToken = authentication.getCredentials().toString();
         }

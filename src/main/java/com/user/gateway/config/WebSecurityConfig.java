@@ -1,7 +1,5 @@
-package com.vmware.user.apigateway.config;
+package com.user.gateway.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +17,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class WebSecurityConfig {
-	private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
 
 	/**
@@ -41,14 +38,14 @@ public class WebSecurityConfig {
 	 * @return the security web filter chain
 	 */
 	@Bean
-	public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
 
-		return http.csrf().disable().authorizeExchange().pathMatchers("/ping").permitAll()
-				.pathMatchers("/**").access(authorizationManager)
-				.and()
-				.httpBasic().and().formLogin().authenticationManager(authenticationManager)
-				.and().build();
-	}
+        return http.csrf().disable().authorizeExchange().pathMatchers("/ping").permitAll()
+                .pathMatchers("/**").access(authorizationManager)
+                .and()
+                .httpBasic().and().formLogin().authenticationManager(authenticationManager)
+                .and().build();
+    }
 
 	/**
 	 * Password encoder password encoder.
@@ -56,9 +53,9 @@ public class WebSecurityConfig {
 	 * @return the password encoder
 	 */
 	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 
 }

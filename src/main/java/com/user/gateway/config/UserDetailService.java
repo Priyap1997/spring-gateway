@@ -1,4 +1,4 @@
-package com.vmware.user.apigateway.config;
+package com.user.gateway.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,9 +1,17 @@
-logging.level.root=WARN
-logging.level.com.vmware=DEBUG
-logging.config=classpath:logback-spring.xml
+server.port: 8090
 security:
+  basic:
+    enabled: true
   user:
     name: user
-    password: pass
-logging.level.org.springframework.cloud=WARN
-management.endpoints.web.base-path=/actuator
+    password: userpass
+spring:
+  main:
+    allow-circular-references: true
+  cloud:
+    gateway:
+      routes:
+        - id: serviceA
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/**
