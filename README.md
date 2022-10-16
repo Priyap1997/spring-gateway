@@ -2,14 +2,16 @@
 A simple Spring Gateway app
 
 ## How to Run Application
-Start the application using any of the commands mentioned below
 
-Note: First two commands need to run inside the root folder of this project i.e inside the spring-gateway folder
+**Start the application using any of the commands mentioned below**
 
-###### Using maven
+> **Note:** First two commands need to run inside the root folder of this project i.e inside the spring-gateway folder
+
+- **Using maven** <br/>``` mvn spring-boot:run```
 mvn spring-boot:run
 
-###### From jar file Create a jar file using 'mvn clean install' command and then execute
+- **From jar file**
+Create a jar file using 'mvn clean install' command and then execute
 java -jar target/spring-api-gateway.jar
 
 Directly from IDE
@@ -17,6 +19,8 @@ Right click on UserApiGatewayApplication.java and click on 'Run' option
 
 
 Note: This spring boot application will starts on port number 8090.
+
+<br/>
 
 Send an HTTP GET request to '/api/hello' endpoint using any of the two methods
 
