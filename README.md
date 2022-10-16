@@ -21,9 +21,11 @@ Note: This spring boot application will starts on port number 8090.
 Send an HTTP GET request to '/api/hello' endpoint using any of the two methods
 
 ###### **Postman**
+
 http://localhost:8090/api/hello
 header Authorization Basic dXNlcjp1c2VycGFzcw==
 
 ###### **cURL**
+
 curl --location --request GET 'http://localhost:8090/api/hello' \
 --header 'Authorization: Basic dXNlcjp1c2VycGFzcw=='
